@@ -1,11 +1,68 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Estate Builder</title>
-    </head>
-    <body>
-        Testing GitHub
-    </body>
+<head>
+    <meta charset="utf-8" />
+    <title>Building Placer</title>
+    <link rel="stylesheet" href = "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+    <script src="Scripts/pixi.js"></script>
+</head>
+
+<body data-ng-app="">
+    <!--
+    <select class="btn btn-default">
+        <option value="size1">Size 1</option>
+        <option value="size2">Size 2</option>
+        <option value="size4">Size 4</option>
+        <option value="size8">Size 8</option>
+    </select>
+
+    <button class="btn btn-default">
+        <span class="glyphicon glyphicon-refresh"></span> Rotate
+    </button>
+    -->
+    <div>
+    <script>
+        // create an new instance of a pixi stage
+        var stage = new PIXI.Stage(0x66FF99);
+
+        // create a renderer instance
+        var renderer = PIXI.autoDetectRenderer(400, 300);
+        renderer.resize(window.innerWidth-5, window.innerHeight-5);
+
+        // add the renderer view element to the DOM
+        document.body.appendChild(renderer.view);
+
+        requestAnimFrame(animate);
+
+        // create a texture from an image path
+        var texture = PIXI.Texture.fromImage("Images/bunny.png");
+        // create a new Sprite using the texture
+        var bunny = new PIXI.Sprite(texture);
+
+        // center the sprites anchor point
+        bunny.anchor.x = 0.5;
+        bunny.anchor.y = 0.5;
+
+        // move the sprite t the center of the screen
+        bunny.position.x = 200;
+        bunny.position.y = 150;
+
+        stage.addChild(bunny);
+
+        function animate() {
+
+            requestAnimFrame(animate);
+
+            // just for fun, lets rotate mr rabbit a little
+            bunny.rotation += 0.1;
+            
+            // render the stage   
+            renderer.render(stage);
+        }
+    </script>
+    </div>
+
+</body>
 </html>
