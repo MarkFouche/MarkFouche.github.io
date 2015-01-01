@@ -1,68 +1,245 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html>
 <head>
-    <meta charset="utf-8" />
-    <title>Building Placer</title>
-    <link rel="stylesheet" href = "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
-    <script src="Scripts/pixi.js"></script>
-</head>
-
-<body data-ng-app="">
+    <title>Estate Viewer</title>
+    <!--The following css will hide the columns with the pictures-->
     <!--
-    <select class="btn btn-default">
-        <option value="size1">Size 1</option>
-        <option value="size2">Size 2</option>
-        <option value="size4">Size 4</option>
-        <option value="size8">Size 8</option>
-    </select>
-
-    <button class="btn btn-default">
-        <span class="glyphicon glyphicon-refresh"></span> Rotate
-    </button>
+    <style type="text/css">
+        #ctl00_MainContent_tabsItems_tabFullBuildView_GridView5 tr *:nth-child(2) {
+            display: none;
+        }
+        #ctl00_MainContent_tabsItems_tabFullBuildView_GridView5 tr *:nth-child(4) {
+            display: none;
+        }
+    </style> 
     -->
-    <div>
-    <script>
-        // create an new instance of a pixi stage
-        var stage = new PIXI.Stage(0x66FF99);
+    <script type="text/javascript" language="JavaScript" src="Scripts/estate.viewer.js"></script>
+    <script type="text/javascript" language="JavaScript">
+        window.onload = function () {
+            // Values can change depending on html content
+            var canvasIDToDrawEstate = "EstateCanvas";
+            var tableMetaData = new TableMetaData();
+            tableMetaData.tableIDWithEstateData = "ctl00_MainContent_tabsItems_tabFullBuildView_GridView5";
+            tableMetaData.colArceID = 0;
+            tableMetaData.colLandTilePic = 1;
+            tableMetaData.colBuildingPic = 3;
+            tableMetaData.colBuildingSize = 10;
+            tableMetaData.colBuildingName = 4;
 
-        // create a renderer instance
-        var renderer = PIXI.autoDetectRenderer(400, 300);
-        renderer.resize(window.innerWidth-5, window.innerHeight-5);
-
-        // add the renderer view element to the DOM
-        document.body.appendChild(renderer.view);
-
-        requestAnimFrame(animate);
-
-        // create a texture from an image path
-        var texture = PIXI.Texture.fromImage("Images/bunny.png");
-        // create a new Sprite using the texture
-        var bunny = new PIXI.Sprite(texture);
-
-        // center the sprites anchor point
-        bunny.anchor.x = 0.5;
-        bunny.anchor.y = 0.5;
-
-        // move the sprite t the center of the screen
-        bunny.position.x = 200;
-        bunny.position.y = 150;
-
-        stage.addChild(bunny);
-
-        function animate() {
-
-            requestAnimFrame(animate);
-
-            // just for fun, lets rotate mr rabbit a little
-            bunny.rotation += 0.1;
-            
-            // render the stage   
-            renderer.render(stage);
+            if (document.getElementById(tableMetaData.tableIDWithEstateData)) {
+                var estateViewer = new EstateViewer();
+                estateViewer.init(canvasIDToDrawEstate, tableMetaData);
+            }
+            else {
+                alert("Table with ID: " + tableMetaData.tableIDWithEstateData + " does not exist");
+            }
         }
     </script>
-    </div>
+</head>
+<body>
+    <h1>Canvas Tester</h1>
+    
+    <canvas id="EstateCanvas" width="1600" height="1000"></canvas>
+    
+    <p />
+    <div id="ctl00_MainContent_tabsItems_tabFullBuildView">
 
+        <table style="width: 100%">
+            <tr>
+                <td style="text-align: left">
+                    <div>
+                        <table cellspacing="0" rules="all" border="1" id="ctl00_MainContent_tabsItems_tabFullBuildView_GridView5" style="border-collapse:collapse;">
+                            <tr>
+                                <th scope="col">Acre</th>
+                                <th scope="col">LandPic</th>
+                                <th scope="col">Number</th>
+                                <th scope="col">BuildingPic</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Purchased</th>
+                                <th scope="col">Cost (Shields)</th>
+                                <th scope="col">Income (Shields)</th>
+                                <th scope="col">Workers</th>
+                                <th scope="col">Happiness</th>
+                                <th scope="col">Acres</th>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0001</td>
+                                <td>
+                                <img src="images/Estate/land.png" /></td>
+                                <td>SVR0001-0001-01</td>
+                                <td></td>
+                                <td>Roads (Infrastructure per existing acre) </td>
+                                <td>November 28, 2013</td>
+                                <td>200</td>
+                                <td>-10</td>
+                                <td>4</td>
+                                <td>2</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0001</td>
+                                <td>
+                                <img src="images/Estate/land.png" /></td>
+                                <td>SVR0001-0001-02</td>
+                                <td>
+                                <img src="images/Estate/building_0.125.png" /></td>
+                                <td>Laboratory (Alchemy) </td>
+                                <td>November 28, 2013</td>
+                                <td>750</td>
+                                <td>60</td>
+                                <td>5</td>
+                                <td>-1</td>
+                                <td>0.125</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0001</td>
+                                <td>
+                                <img src="images/Estate/land.png" /></td>
+                                <td>SVR0001-0001-03</td>
+                                <td>
+                                <img src="images/Estate/building_0.125.png" /></td>
+                                <td>Laboratory (Alchemy) </td>
+                                <td>November 28, 2013</td>
+                                <td>750</td>
+                                <td>60</td>
+                                <td>5</td>
+                                <td>-1</td>
+                                <td>0.125</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0001</td>
+                                <td>
+                                <img src="images/Estate/land.png" /></td>
+                                <td>SVR0001-0001-04</td>
+                                <td>
+                                <img src="images/Estate/building_0.125.png" /></td>
+                                <td>Artisan (Specify) Lithographer</td>
+                                <td>November 28, 2013</td>
+                                <td>750</td>
+                                <td>20</td>
+                                <td>5</td>
+                                <td>2</td>
+                                <td>0.125</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0002</td>
+                                <td>
+                                <img src="images/Estate/land_e.png" /></td>
+                                <td>SVR0001-0002-01</td>
+                                <td>
+                                <img src="images/Estate/building_0.125.png" /></td>
+                                <td>Laboratory (Alchemy) </td>
+                                <td>November 28, 2013</td>
+                                <td>750</td>
+                                <td>60</td>
+                                <td>5</td>
+                                <td>-1</td>
+                                <td>0.125</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0002</td>
+                                <td>
+                                <img src="images/Estate/land_e.png" /></td>
+                                <td>SVR0001-0002-02</td>
+                                <td></td>
+                                <td>Roads (Infrastructure per existing acre) </td>
+                                <td>November 28, 2013</td>
+                                <td>200</td>
+                                <td>-10</td>
+                                <td>4</td>
+                                <td>2</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0002</td>
+                                <td>
+                                <img src="images/Estate/land_e.png" /></td>
+                                <td>SVR0001-0002-03</td>
+                                <td>
+                                <img src="images/Estate/building_0.25.png" /></td>
+                                <td>Tavern Darce&#39;s Den</td>
+                                <td>November 28, 2013</td>
+                                <td>500</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>3</td>
+                                <td>0.25</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0002</td>
+                                <td>
+                                    <img src="images/Estate/land_e.png" />
+                                </td>
+                                <td>SVR0001-0002-04</td>
+                                <td>
+                                    <img src="images/Estate/building_0.5.png" />
+                                </td>
+                                <td>Building the size of Manor</td>
+                                <td>November 28, 2013</td>
+                                <td>500</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>3</td>
+                                <td>0.5</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0003</td>
+                                <td>
+                                    <img src="images/Estate/land.png" />
+                                </td>
+                                <td>SVR0001-0003-01</td>
+                                <td>
+                                    <img src="images/Estate/building_1.0.png" />
+                                </td>
+                                <td>Big Building</td>
+                                <td>November 28, 2013</td>
+                                <td>500</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>3</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0004</td>
+                                <td>
+                                    <img src="images/Estate/land.png" />
+                                </td>
+                                <td>SVR0001-0004-01</td>
+                                <td>
+                                    <img src="images/Estate/building_1.0.png" />
+                                </td>
+                                <td>Big Building</td>
+                                <td>November 28, 2013</td>
+                                <td>500</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>3</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>SVR0001-0005</td>
+                                <td>
+                                    <img src="images/Estate/land.png" />
+                                </td>
+                                <td>SVR0001-0005-01</td>
+                                <td>
+                                    <img src="images/Estate/building_1.0.png" />
+                                </td>
+                                <td>Big Building</td>
+                                <td>November 28, 2013</td>
+                                <td>500</td>
+                                <td>10</td>
+                                <td>5</td>
+                                <td>3</td>
+                                <td>1</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    
 </body>
 </html>
