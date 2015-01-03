@@ -4,13 +4,17 @@
     <head>
         <meta charset="utf-8" />
         <title></title>
-        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <script src="Scripts/EstateViewer/Leaflet/leaflet.js"></script>
+        <script src="Scripts/EstateViewer/Leaflet/Pluggings/Control.FullScreen.js"></script>
+        <link rel="stylesheet" href="Styles/EstateViewer/Leaflet/leaflet.css" />
+        <link rel="stylesheet" href="Styles/EstateViewer/Leaflet/Pluggings/Control.FullScreen.css" />
+        <!-- Mobile -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
     </head>
     <body>
-        <div id="image-map" style="height: 600px"></div>
-        <canvas id="html5canvas"></canvas>
-        <img id="test-image" src="images/Estate/maptest.jpg" /></td>
+        <div id="image-map" style="height: 400px"></div>
+        <img id="test-image" style="visibility: hidden" src="images/Estate/maptest.jpg" /></td>
 
         <script>
             "use strict";
@@ -41,7 +45,11 @@
                 maxZoom: 4,
                 center: [0, 0],
                 zoom: DEFAULT_ZOOM_LEVEL,
-                crs: L.CRS.Simple
+                crs: L.CRS.Simple,
+                fullscreenControl: true,
+                fullscreenControlOptions: {
+                    position: 'topleft'
+                }
             });
 
             // dimensions of the image
