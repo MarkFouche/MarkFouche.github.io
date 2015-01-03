@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <script src="Scripts/EstateViewer/Leaflet/leaflet.js"></script>
+        <script src="Scripts/EstateViewer/Leaflet/Pluggings/Control.FullScreen.js"></script>
+        <link rel="stylesheet" href="Styles/EstateViewer/Leaflet/leaflet.css" />
+        <link rel="stylesheet" href="Styles/EstateViewer/Leaflet/Pluggings/Control.FullScreen.css" />
+        <!-- Mobile -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    </head>
+    <body>
+        <div id="image-map" style="height: 400px"></div>
+        <img id="test-image" style="visibility: hidden" src="images/Estate/maptest.jpg" /></td>
+
+        <script>
+            "use strict";
+
+            var canvas = document.createElement('canvas');
+
+            function convertImageToCanvas(image) {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                var drawSurface = canvas.getContext("2d");
+                drawSurface.drawImage(image, 0, 0);
+            }
+
+            function convertCanvasToImage(canvas) {
+                var image = new Image();
+                image.src = canvas.toDataURL();
+                return image;
+            }
+
+            var tempImage = document.getElementById("test-image");
+            convertImageToCanvas(tempImage);
+            var myImage = convertCanvasToImage(canvas);
+
+            // create the image map
+            var DEFAULT_ZOOM_LEVEL = 3;
+            var map = L.map('image-map', {
+                minZoom: 1,
+                maxZoom: 4,
+                center: [0, 0],
+                zoom: DEFAULT_ZOOM_LEVEL,
+                crs: L.CRS.Simple,
+                fullscreenControl: true,
+                fullscreenControlOptions: {
+                    position: 'topleft'
+                }
+            });
+
+            // dimensions of the image
+            var w = myImage.width,
+                h = myImage.height,
+                url = myImage.src;
+
+            // calculate the edges of the image, in coordinate space
+            var southWest = map.unproject([0, h], DEFAULT_ZOOM_LEVEL);
+            var northEast = map.unproject([w, 0], DEFAULT_ZOOM_LEVEL);
+            var bounds = new L.LatLngBounds(southWest, northEast);
+
+            // add the image overlay,
+            // so that it covers the entire map
+            L.imageOverlay(url, bounds).addTo(map);
+
+            // tell leaflet that the map is exactly as big as the image
+            map.setMaxBounds(bounds);
+
+            // add polygon
+            var polygon = L.polygon([
+                map.unproject([0, 0], DEFAULT_ZOOM_LEVEL),
+                map.unproject([0, myImage.height], DEFAULT_ZOOM_LEVEL),
+                map.unproject([100, myImage.height], DEFAULT_ZOOM_LEVEL),],
+                { opacity: 0, fillOpacity: 0.1 }
+            ).addTo(map).bindPopup("I am a circle.");
+        </script>
+    </body>
+</html>
