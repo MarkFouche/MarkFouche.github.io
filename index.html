@@ -1,246 +1,67 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Estate Viewer</title>
-    <!--The following css will hide the columns with the pictures-->
-    <!--
-    <style type="text/css">
-        #ctl00_MainContent_tabsItems_tabFullBuildView_GridView5 tr *:nth-child(2) {
-            display: none;
-        }
-        #ctl00_MainContent_tabsItems_tabFullBuildView_GridView5 tr *:nth-child(4) {
-            display: none;
-        }
-    </style> 
-    -->
-    <script type="text/javascript" language="JavaScript" src="Scripts/hammer.min.js"></script>
-    <script type="text/javascript" language="JavaScript" src="Scripts/estate.viewer.js"></script>
-    <script type="text/javascript" language="JavaScript">
-        window.onload = function () {
-            // Values can change depending on html content
-            var canvasIDToDrawEstate = "EstateCanvas";
-            var tableMetaData = new TableMetaData();
-            tableMetaData.tableIDWithEstateData = "ctl00_MainContent_tabsItems_tabFullBuildView_GridView5";
-            tableMetaData.colArceID = 0;
-            tableMetaData.colLandTilePic = 1;
-            tableMetaData.colBuildingPic = 3;
-            tableMetaData.colBuildingSize = 10;
-            tableMetaData.colBuildingName = 4;
 
-            if (document.getElementById(tableMetaData.tableIDWithEstateData)) {
-                var estateViewer = new EstateViewer();
-                estateViewer.init(canvasIDToDrawEstate, tableMetaData);
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    </head>
+    <body>
+        <div id="image-map" style="height: 600px"></div>
+        <canvas id="html5canvas"></canvas>
+        <img id="test-image" src="images/Estate/maptest.jpg" /></td>
+
+        <script>
+            "use strict";
+            
+            var canvas = document.getElementById("html5canvas");
+            
+            function convertImageToCanvas(image) {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                var drawSurface = canvas.getContext("2d");
+                drawSurface.drawImage(image, 0, 0);
             }
-            else {
-                alert("Table with ID: " + tableMetaData.tableIDWithEstateData + " does not exist");
+
+            function convertCanvasToImage(canvas) {
+                var image = new Image();
+                image.src = canvas.toDataURL();
+                console.log(canvas.toDataURL());
+                return image;
             }
-        }
-    </script>
-</head>
-<body>
-    <h1>Canvas Tester</h1>
-    
-    <canvas id="EstateCanvas" width="1600" height="600"></canvas>
-    
-    <p />
-    <div id="ctl00_MainContent_tabsItems_tabFullBuildView">
 
-        <table style="width: 100%">
-            <tr>
-                <td style="text-align: left">
-                    <div>
-                        <table cellspacing="0" rules="all" border="1" id="ctl00_MainContent_tabsItems_tabFullBuildView_GridView5" style="border-collapse:collapse;">
-                            <tr>
-                                <th scope="col">Acre</th>
-                                <th scope="col">LandPic</th>
-                                <th scope="col">Number</th>
-                                <th scope="col">BuildingPic</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Purchased</th>
-                                <th scope="col">Cost (Shields)</th>
-                                <th scope="col">Income (Shields)</th>
-                                <th scope="col">Workers</th>
-                                <th scope="col">Happiness</th>
-                                <th scope="col">Acres</th>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0001</td>
-                                <td>
-                                <img src="images/Estate/land.png" /></td>
-                                <td>SVR0001-0001-01</td>
-                                <td></td>
-                                <td>Roads (Infrastructure per existing acre) </td>
-                                <td>November 28, 2013</td>
-                                <td>200</td>
-                                <td>-10</td>
-                                <td>4</td>
-                                <td>2</td>
-                                <td>0</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0001</td>
-                                <td>
-                                <img src="images/Estate/land.png" /></td>
-                                <td>SVR0001-0001-02</td>
-                                <td>
-                                <img src="images/Estate/building_0.125.png" /></td>
-                                <td>Laboratory (Alchemy) </td>
-                                <td>November 28, 2013</td>
-                                <td>750</td>
-                                <td>60</td>
-                                <td>5</td>
-                                <td>-1</td>
-                                <td>0.125</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0001</td>
-                                <td>
-                                <img src="images/Estate/land.png" /></td>
-                                <td>SVR0001-0001-03</td>
-                                <td>
-                                <img src="images/Estate/building_0.125.png" /></td>
-                                <td>Laboratory (Alchemy) </td>
-                                <td>November 28, 2013</td>
-                                <td>750</td>
-                                <td>60</td>
-                                <td>5</td>
-                                <td>-1</td>
-                                <td>0.125</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0001</td>
-                                <td>
-                                <img src="images/Estate/land.png" /></td>
-                                <td>SVR0001-0001-04</td>
-                                <td>
-                                <img src="images/Estate/building_0.125.png" /></td>
-                                <td>Artisan (Specify) Lithographer</td>
-                                <td>November 28, 2013</td>
-                                <td>750</td>
-                                <td>20</td>
-                                <td>5</td>
-                                <td>2</td>
-                                <td>0.125</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0002</td>
-                                <td>
-                                <img src="images/Estate/land_e.png" /></td>
-                                <td>SVR0001-0002-01</td>
-                                <td>
-                                <img src="images/Estate/building_0.125.png" /></td>
-                                <td>Laboratory (Alchemy) </td>
-                                <td>November 28, 2013</td>
-                                <td>750</td>
-                                <td>60</td>
-                                <td>5</td>
-                                <td>-1</td>
-                                <td>0.125</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0002</td>
-                                <td>
-                                <img src="images/Estate/land_e.png" /></td>
-                                <td>SVR0001-0002-02</td>
-                                <td></td>
-                                <td>Roads (Infrastructure per existing acre) </td>
-                                <td>November 28, 2013</td>
-                                <td>200</td>
-                                <td>-10</td>
-                                <td>4</td>
-                                <td>2</td>
-                                <td>0</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0002</td>
-                                <td>
-                                <img src="images/Estate/land_e.png" /></td>
-                                <td>SVR0001-0002-03</td>
-                                <td>
-                                <img src="images/Estate/building_0.25.png" /></td>
-                                <td>Tavern Darce&#39;s Den</td>
-                                <td>November 28, 2013</td>
-                                <td>500</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>3</td>
-                                <td>0.25</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0002</td>
-                                <td>
-                                    <img src="images/Estate/land_e.png" />
-                                </td>
-                                <td>SVR0001-0002-04</td>
-                                <td>
-                                    <img src="images/Estate/building_0.5.png" />
-                                </td>
-                                <td>Building the size of Manor</td>
-                                <td>November 28, 2013</td>
-                                <td>500</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>3</td>
-                                <td>0.5</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0003</td>
-                                <td>
-                                    <img src="images/Estate/land.png" />
-                                </td>
-                                <td>SVR0001-0003-01</td>
-                                <td>
-                                    <img src="images/Estate/building_1.0.png" />
-                                </td>
-                                <td>Big Building</td>
-                                <td>November 28, 2013</td>
-                                <td>500</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>3</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0004</td>
-                                <td>
-                                    <img src="images/Estate/land.png" />
-                                </td>
-                                <td>SVR0001-0004-01</td>
-                                <td>
-                                    <img src="images/Estate/building_1.0.png" />
-                                </td>
-                                <td>Big Building</td>
-                                <td>November 28, 2013</td>
-                                <td>500</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>3</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>SVR0001-0005</td>
-                                <td>
-                                    <img src="images/Estate/land.png" />
-                                </td>
-                                <td>SVR0001-0005-01</td>
-                                <td>
-                                    <img src="images/Estate/building_1.0.png" />
-                                </td>
-                                <td>Big Building</td>
-                                <td>November 28, 2013</td>
-                                <td>500</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>3</td>
-                                <td>1</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </table>
+            var tempImage = document.getElementById("test-image");
+            console.log(document.getElementById("test-image").src);
+            console.log(tempImage.src);
+            convertImageToCanvas(tempImage);
+            var myImage = convertCanvasToImage(canvas);
 
-    </div>
-    
-</body>
+            // create the image map
+            var map = L.map('image-map', {
+                minZoom: 1,
+                maxZoom: 4,
+                center: [0, 0],
+                zoom: 1,
+                crs: L.CRS.Simple
+            });
+
+            // dimensions of the image
+            var w = 824,
+                h = 453,
+                url = myImage.src;
+
+            // calculate the edges of the image, in coordinate space
+            var southWest = map.unproject([0, h], map.getMaxZoom() - 1);
+            var northEast = map.unproject([w, 0], map.getMaxZoom() - 1);
+            var bounds = new L.LatLngBounds(southWest, northEast);
+
+            // add the image overlay,
+            // so that it covers the entire map
+            L.imageOverlay(url, bounds).addTo(map);
+
+            // tell leaflet that the map is exactly as big as the image
+            map.setMaxBounds(bounds); 
+        </script>
+    </body>
 </html>
