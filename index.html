@@ -14,9 +14,9 @@
 
         <script>
             "use strict";
-            
-            var canvas = document.getElementById("html5canvas");
-            
+
+            var canvas = document.createElement('canvas');
+
             function convertImageToCanvas(image) {
                 canvas.width = image.width;
                 canvas.height = image.height;
@@ -27,33 +27,31 @@
             function convertCanvasToImage(canvas) {
                 var image = new Image();
                 image.src = canvas.toDataURL();
-                console.log(canvas.toDataURL());
                 return image;
             }
 
             var tempImage = document.getElementById("test-image");
-            console.log(document.getElementById("test-image").src);
-            console.log(tempImage.src);
             convertImageToCanvas(tempImage);
             var myImage = convertCanvasToImage(canvas);
 
             // create the image map
+            var DEFAULT_ZOOM_LEVEL = 3;
             var map = L.map('image-map', {
                 minZoom: 1,
                 maxZoom: 4,
                 center: [0, 0],
-                zoom: 1,
+                zoom: DEFAULT_ZOOM_LEVEL,
                 crs: L.CRS.Simple
             });
 
             // dimensions of the image
-            var w = 824,
-                h = 453,
+            var w = myImage.width,
+                h = myImage.height,
                 url = myImage.src;
 
             // calculate the edges of the image, in coordinate space
-            var southWest = map.unproject([0, h], map.getMaxZoom() - 1);
-            var northEast = map.unproject([w, 0], map.getMaxZoom() - 1);
+            var southWest = map.unproject([0, h], DEFAULT_ZOOM_LEVEL);
+            var northEast = map.unproject([w, 0], DEFAULT_ZOOM_LEVEL);
             var bounds = new L.LatLngBounds(southWest, northEast);
 
             // add the image overlay,
@@ -61,7 +59,15 @@
             L.imageOverlay(url, bounds).addTo(map);
 
             // tell leaflet that the map is exactly as big as the image
-            map.setMaxBounds(bounds); 
+            map.setMaxBounds(bounds);
+
+            // add polygon
+            var polygon = L.polygon([
+                map.unproject([0, 0], DEFAULT_ZOOM_LEVEL),
+                map.unproject([0, myImage.height], DEFAULT_ZOOM_LEVEL),
+                map.unproject([100, myImage.height], DEFAULT_ZOOM_LEVEL),],
+                { opacity: 0, fillOpacity: 0.1 }
+            ).addTo(map).bindPopup("I am a circle.");
         </script>
     </body>
 </html>
