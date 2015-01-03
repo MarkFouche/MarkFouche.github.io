@@ -52,12 +52,13 @@ function EstateViewer() {
     var estate = new Estate();
     var canvas;
     var drawSurface;
-    var canvasImageTranslate = { x: 0, y: 0 };
+    var canvasImageTranslate = new Point(0, 0);
     var canvasImageScale = .5;
-    var panPrevPos = new Point(0, 0);
 
     this.init = function (canvasIDToDrawTo, tableMetaDataInput) {
         canvas = document.getElementById(canvasIDToDrawTo);
+        canvas.width = window.screen.availWidth;
+        canvas.height = window.screen.availHeight;
         drawSurface = canvas.getContext("2d");
         tableMetaData = tableMetaDataInput;
 
@@ -178,7 +179,8 @@ function EstateViewer() {
     // Uses hammer.js for mobile gestures
     var setUpMobileGestureInteractions = function () {
         var mc = new Hammer(canvas);
-        
+        var panPrevPos = new Point(0, 0);
+
         mc.on("panstart", function (ev) {
             panPrevPos.x = event.x;
             panPrevPos.y = event.y;
@@ -192,11 +194,19 @@ function EstateViewer() {
         });
 
         mc.on("pinchmove", function (ev) {
-	        canvasImageScale = canvasImageScale * ev.scale;
-	    });
+            canvasImageScale = canvasImageScale * ev.scale;
+        });
 
-        mc.on("tap", function (ev) {
-            console.log(event);
+        mc.on("doubletap", function (ev) {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            } else if (canvas.mozRequestFullScreen) {
+                canvas.mozRequestFullScreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            }
         });
     }
 
