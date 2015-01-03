@@ -254,12 +254,12 @@ function EstateViewer() {
         }
     }
 
-    var createLeafletMapViewerForEstateImage = function() {
+    var createLeafletMapViewerForEstateImage = function () {
+
         // create the image map
         leafletMapViewer = L.map(divIDForLeafletViewer, {
             minZoom: 1,
             maxZoom: 4,
-            center: [0, 0],
             zoom: DEFAULT_ZOOM_LEVEL,
             crs: L.CRS.Simple,
             fullscreenControl: true,
@@ -272,6 +272,13 @@ function EstateViewer() {
         var w = estateImage.width,
             h = estateImage.height,
             url = estateImage.src;
+
+        // center image
+        leafletMapViewer.setView(leafletMapViewer.unproject([
+                estateImage.width / 2,
+                estateImage.height / 2], 
+                DEFAULT_ZOOM_LEVEL),
+            DEFAULT_ZOOM_LEVEL);
 
         // calculate the edges of the image, in coordinate space
         var southWest = leafletMapViewer.unproject([0, h], DEFAULT_ZOOM_LEVEL);
