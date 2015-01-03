@@ -35,7 +35,7 @@ function LandTile() {
     this.pos;
 }
 
-function Position(x, y) {
+function Point(x, y) {
     this.x = x;
     this.y = y;
 }
@@ -45,11 +45,16 @@ function EstateViewer() {
     var NUM_TILES_IN_ACRE_ROW = 4;
     var NUM_TILES_IN_ACRE_COL = 2;
     var NUM_TIMES_MORE_COLS_THAN_ROWS = 2;
+    var TILE_IMAGE_WIDTH = 200;
+    var TILE_IMAGE_HEIGHT = 100;
     
-    var canvas;
-    var drawSurface;
     var tableMetaData;
     var estate = new Estate();
+    var canvas;
+    var drawSurface;
+    var canvasImageTranslate = { x: 0, y: 0 };
+    var canvasImageScale = .5;
+    var panPrevPos = new Point(0, 0);
 
     this.init = function (canvasIDToDrawTo, tableMetaDataInput) {
         canvas = document.getElementById(canvasIDToDrawTo);
@@ -57,7 +62,10 @@ function EstateViewer() {
         tableMetaData = tableMetaDataInput;
 
         getEstateDataFromDOM();
-        convertEstateDataToDrawData();
+        calculateAndSortBuildingPositionsForAcres();
+        createAcreMatrixFromAcreList();
+        setUpMobileGestureInteractions();
+        centerEstateOnCanvasAroundPoint(new Point(canvas.width / 2, canvas.height / 2));
         setUpWindowForAnimations();
         animate();
     }
@@ -106,15 +114,48 @@ function EstateViewer() {
         estate.acreList = acres;
     }
 
-    var convertEstateDataToDrawData = function () {
-        calculateBuildingPositionsForAcres();
-        createAcreMatrixFromAcreList();
-    }
+    var calculateAndSortBuildingPositionsForAcres = function () {
+        for (var a = 0; a < estate.acreList.length; a++) {
+            var buildings = [];
+            var currentPos = new Point(0, 0);
 
-    var calculateBuildingPositionsForAcres = function () {
-       // for () {
-       ///////////////////////////////////////////////////////////////////////////////////////////////     
-       // }
+            for (var b = 0; b < estate.acreList[a].buildings.length; b++) {
+                if (estate.acreList[a].buildings[b].size == 1) {
+                    estate.acreList[a].buildings[b].pos = new Point(currentPos.x, currentPos.y);
+                    buildings.push(estate.acreList[a].buildings[b]);
+                }
+            }
+
+            for (var b = 0; b < estate.acreList[a].buildings.length; b++) {
+                if (estate.acreList[a].buildings[b].size == 0.5) {
+                    estate.acreList[a].buildings[b].pos = new Point(currentPos.x, currentPos.y);
+                    currentPos.y += 2;
+                    buildings.push(estate.acreList[a].buildings[b]);
+                }
+            }
+
+            for (var b = 0; b < estate.acreList[a].buildings.length; b++) {
+                if (estate.acreList[a].buildings[b].size == 0.25) {
+                    estate.acreList[a].buildings[b].pos = new Point(currentPos.x, currentPos.y);
+                    currentPos.y += 1;
+                    buildings.push(estate.acreList[a].buildings[b]);
+                }
+            }
+
+            for (var b = 0; b < estate.acreList[a].buildings.length; b++) {
+                if (estate.acreList[a].buildings[b].size == 0.125) {
+                    estate.acreList[a].buildings[b].pos = new Point((currentPos.x + 1) % 2, currentPos.y);
+                    currentPos.x++;
+                    if (currentPos.x > 1) {
+                        currentPos.x = 0;
+                        currentPos.y++;
+                    }
+                    buildings.push(estate.acreList[a].buildings[b]);
+                }
+            }
+
+            estate.acreList[a].buildings = buildings;
+        }
     }
 
     var createAcreMatrixFromAcreList = function () {
@@ -129,9 +170,47 @@ function EstateViewer() {
         for (var a = 0; a < estate.acreList.length; a++) {
             var xPos = a % estate.numOfAcreCols;
             var yPos = Math.floor(a / estate.numOfAcreCols);
-            estate.acreList[a].pos = new Position(xPos, yPos);
+            estate.acreList[a].pos = new Point(xPos, yPos);
             estate.acreMatrix[xPos][yPos] = estate.acreList[a];
         }
+    }
+
+    // Uses hammer.js for mobile gestures
+    var setUpMobileGestureInteractions = function () {
+        var mc = new Hammer(canvas);
+        
+        mc.on("panstart", function (ev) {
+            panPrevPos.x = event.x;
+            panPrevPos.y = event.y;
+        });
+
+        mc.on("panmove", function (ev) {
+            canvasImageTranslate.x += event.x - panPrevPos.x;
+            canvasImageTranslate.y += event.y - panPrevPos.y;
+            panPrevPos.x = event.x;
+            panPrevPos.y = event.y;
+        });
+
+        mc.on("pinchmove", function (ev) {
+	        canvasImageScale = canvasImageScale * ev.scale;
+	    });
+
+        mc.on("tap", function (ev) {
+            console.log(event);
+        });
+    }
+
+    var centerEstateOnCanvasAroundPoint = function (pos) {
+        var numColTiles = estate.numOfAcreCols * NUM_TILES_IN_ACRE_COL;
+        var numRowTiles = estate.numOfAcreRows * NUM_TILES_IN_ACRE_ROW;
+        var totalEstateImageWidth = (numColTiles + numRowTiles) * TILE_IMAGE_WIDTH / 2 * canvasImageScale;
+        var totalEstateImageHeight = (numColTiles + numRowTiles) * TILE_IMAGE_HEIGHT / 2 * canvasImageScale;
+        var estateYOffset = numColTiles * TILE_IMAGE_HEIGHT / 2 * canvasImageScale;
+        var imageXOffset = pos.x - totalEstateImageWidth / 2;
+        var imageYOffset = estateYOffset + pos.y - totalEstateImageHeight / 2;
+
+        canvasImageTranslate.x = imageXOffset;
+        canvasImageTranslate.y = imageYOffset;
     }
 
     var setUpWindowForAnimations = function() {
@@ -149,8 +228,11 @@ function EstateViewer() {
         // update
 
         // clear
+        drawSurface.setTransform(1, 0, 0, 1, 0, 0);
         drawSurface.fillStyle = "lightgrey";
-        drawSurface.fillRect(0, 0, canvas.width, canvas.height);
+        drawSurface.fillRect(0, 0, drawSurface.canvas.width, drawSurface.canvas.height);
+        drawSurface.translate(canvasImageTranslate.x, canvasImageTranslate.y);
+        drawSurface.scale(canvasImageScale, canvasImageScale);
 
         // draw stuff
         drawEstate();
@@ -173,22 +255,30 @@ function EstateViewer() {
     }
 
     var drawLandTiles = function(acre) {
-        var halfImageWidth = acre.landTileImage.width / 2;
-        var halfImageHeight = acre.landTileImage.height / 2;
         var acreOffsetX = acre.pos.x * NUM_TILES_IN_ACRE_COL;
         var acreOffsetY = acre.pos.y * NUM_TILES_IN_ACRE_ROW;
 
         for (var tX = NUM_TILES_IN_ACRE_COL -1; tX > -1; tX--) {
             for (var tY = 0; tY < NUM_TILES_IN_ACRE_ROW; tY++) {
-                var drawPosX = (tX + tY + acreOffsetX + acreOffsetY) * halfImageWidth;
-                var drawPosY = 300 + (tY - tX - acreOffsetX + acreOffsetY) * halfImageHeight;
+                var drawPosX = (tX + tY + acreOffsetX + acreOffsetY) * TILE_IMAGE_WIDTH / 2;
+                var drawPosY = (tY - tX - acreOffsetX + acreOffsetY) * TILE_IMAGE_HEIGHT / 2;
                 drawSurface.drawImage(acre.landTileImage, drawPosX, drawPosY);
             }
         }
     }
 
     var drawBuildings = function (acre) {
-        ///////////////////////////////////////////////////////////////////////////////////////////////
+        var acreOffsetX = acre.pos.x * NUM_TILES_IN_ACRE_COL;
+        var acreOffsetY = acre.pos.y * NUM_TILES_IN_ACRE_ROW;
+
+        for (var b = 0; b < acre.buildings.length; b++) {
+            var buildingYOffset = (acre.buildings[b].size == 0.125) ? 2 : 3;
+            var xOffset = acre.buildings[b].pos.x + acre.buildings[b].pos.y + acreOffsetX + acreOffsetY; 
+            var yOffset = acre.buildings[b].pos.y - acre.buildings[b].pos.x - acreOffsetX + acreOffsetY - buildingYOffset;               
+            var drawPosX = xOffset * TILE_IMAGE_WIDTH / 2;
+            var drawPosY = yOffset * TILE_IMAGE_HEIGHT / 2;
+            drawSurface.drawImage(acre.buildings[b].image, drawPosX, drawPosY);
+        }
     }
 }
 
