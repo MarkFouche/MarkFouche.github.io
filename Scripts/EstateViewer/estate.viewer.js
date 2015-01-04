@@ -32,11 +32,6 @@ function Building() {
     this.drawPos;
 }
 
-function LandTile() {
-    this.buildingOnTile;
-    this.pos;
-}
-
 function Point(x, y) {
     this.x = x;
     this.y = y;
